@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="テキスト処理ツール - 文字コード表示と正規表現チェッカー">
+    <meta name="theme-color" content="#2196F3">
+    <title>Text Toolbox</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Text Toolbox</h1>
+            <p class="subtitle">テキスト関連の便利ツール</p>
+        </header>
+
+        <main>
+            <!-- 文字コード表示ツール -->
+            <section class="tool-section">
+                <h2>🔢 文字コード表示</h2>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label for="charInput">テキストを入力してください:</label>
+                        <textarea
+                            id="charInput"
+                            placeholder="文字を入力すると、文字コードが表示されます"
+                            rows="4"
+                        ></textarea>
+                    </div>
+                    <div id="charCodeOutput" class="output-area"></div>
+                </div>
+            </section>
+
+            <!-- 正規表現チェッカー -->
+            <section class="tool-section">
+                <h2>🔍 正規表現チェッカー</h2>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label for="regexPattern">正規表現パターン:</label>
+                        <input
+                            type="text"
+                            id="regexPattern"
+                            placeholder="例: \d+|[a-z]+"
+                        >
+                        <div class="regex-flags">
+                            <label>
+                                <input type="checkbox" id="flagGlobal" checked> g (グローバル)
+                            </label>
+                            <label>
+                                <input type="checkbox" id="flagIgnoreCase"> i (大文字小文字を区別しない)
+                            </label>
+                            <label>
+                                <input type="checkbox" id="flagMultiline"> m (複数行)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="regexInput">テストする文字列:</label>
+                        <textarea
+                            id="regexInput"
+                            placeholder="正規表現でテストする文字列を入力してください"
+                            rows="4"
+                        ></textarea>
+                    </div>
+                    <div id="regexOutput" class="output-area"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>PWA対応 | GitHub Pages</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Service Worker の登録
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>
