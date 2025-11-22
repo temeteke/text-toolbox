@@ -237,6 +237,17 @@ footer {
     margin-top: 40px;
 }
 
+footer a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+footer a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
 /* モーダルスタイル */
 .modal {
     display: none;
