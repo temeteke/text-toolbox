@@ -729,6 +729,276 @@ footer a:hover {
     }
 }
 
+/* CSV/TSVフォーマッター */
+.csv-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin: 12px 0;
+}
+
+.csv-options label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+}
+
+.csv-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+.csv-table th,
+.csv-table td {
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.csv-table th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+}
+
+.csv-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* マークダウンプレビュー */
+.markdown-preview {
+    min-height: 100px;
+    padding: 20px;
+    background-color: white;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.markdown-preview h1 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin: 20px 0 10px;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+}
+
+.markdown-preview h2 {
+    color: var(--secondary-color);
+    font-size: 1.6rem;
+    margin: 16px 0 8px;
+}
+
+.markdown-preview h3 {
+    color: var(--text-color);
+    font-size: 1.3rem;
+    margin: 12px 0 6px;
+}
+
+.markdown-preview p {
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.markdown-preview code {
+    background-color: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+
+.markdown-preview pre {
+    background-color: #f5f5f5;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+
+.markdown-preview ul {
+    margin: 10px 0;
+    padding-left: 30px;
+}
+
+.markdown-preview li {
+    margin: 5px 0;
+}
+
+.markdown-preview a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.markdown-preview a:hover {
+    text-decoration: underline;
+}
+
+/* QRコード生成 */
+.qr-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.qr-image {
+    max-width: 300px;
+    height: auto;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.qr-download {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.qr-download:hover {
+    background-color: var(--secondary-color);
+}
+
+.qr-output {
+    text-align: center;
+}
+
+/* テキスト分割/結合 */
+.split-options {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.split-options input[type="number"],
+.split-options input[type="text"] {
+    flex: 1;
+    max-width: 200px;
+}
+
+/* 情報ボックス */
+.info-box {
+    background-color: #e3f2fd;
+    border-left: 4px solid var(--primary-color);
+    padding: 12px 16px;
+    margin: 12px 0;
+    border-radius: 4px;
+}
+
+.info-box p {
+    margin: 8px 0;
+}
+
+.info-box small {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* 文字頻度分析 */
+.frequency-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin: 12px 0;
+}
+
+.frequency-options label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+}
+
+.frequency-options input[type="number"] {
+    width: 80px;
+    padding: 8px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.frequency-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.frequency-item {
+    display: grid;
+    grid-template-columns: 50px 100px 1fr 80px;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    transition: box-shadow 0.2s ease;
+}
+
+.frequency-item:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.frequency-rank {
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+.frequency-char {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    font-size: 1.1rem;
+    word-break: break-all;
+}
+
+.frequency-bar {
+    background-color: #e0e0e0;
+    height: 24px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.frequency-bar-fill {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.frequency-count {
+    text-align: right;
+    font-weight: 600;
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    .frequency-item {
+        grid-template-columns: 40px 80px 1fr 60px;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .frequency-char {
+        font-size: 1rem;
+    }
+
+    .csv-table {
+        font-size: 0.9rem;
+    }
+
+    .csv-table th,
+    .csv-table td {
+        padding: 6px 8px;
+    }
+}
+
 @media (max-width: 480px) {
     header h1 {
         font-size: 1.5rem;
@@ -753,5 +1023,27 @@ footer a:hover {
 
     .font-display-grid {
         grid-template-columns: 1fr;
+    }
+
+    .frequency-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .frequency-bar {
+        grid-column: 1 / -1;
+    }
+
+    .csv-table {
+        font-size: 0.85rem;
+    }
+
+    .split-options {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .split-options input {
+        max-width: 100%;
     }
 }
