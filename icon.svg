@@ -15,32 +15,20 @@
   <rect width="512" height="512" rx="115" fill="url(#bgGradient)"/>
 
   <!-- Main letter 'A' -->
-  <text x="256" y="300"
+  <text x="256" y="240"
         font-family="Arial, sans-serif"
-        font-size="220"
+        font-size="280"
         font-weight="bold"
         fill="url(#textGradient)"
         text-anchor="middle"
         dominant-baseline="middle">A</text>
 
   <!-- Hex code '0x41' -->
-  <text x="256" y="400"
+  <text x="256" y="385"
         font-family="Monaco, 'Courier New', monospace"
-        font-size="52"
+        font-size="68"
         font-weight="600"
         fill="#E3F2FD"
         text-anchor="middle"
         opacity="0.95">0x41</text>
-
-  <!-- Subtle decorative elements - brackets to suggest code -->
-  <path d="M 140 180 L 120 180 L 120 320 L 140 320"
-        stroke="#BBDEFB"
-        stroke-width="6"
-        fill="none"
-        opacity="0.4"/>
-  <path d="M 372 180 L 392 180 L 392 320 L 372 320"
-        stroke="#BBDEFB"
-        stroke-width="6"
-        fill="none"
-        opacity="0.4"/>
 </svg>
