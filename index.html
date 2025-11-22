@@ -20,25 +20,73 @@
         </header>
 
         <main>
-            <!-- タブナビゲーション -->
-            <nav class="tab-nav">
-                <button class="tab-button active" data-tab="char-analysis">🔢 文字解析</button>
-                <button class="tab-button" data-tab="regex">🔍 正規表現</button>
-                <button class="tab-button" data-tab="encoding">🔄 エンコーディング</button>
-                <button class="tab-button" data-tab="statistics">📊 テキスト統計</button>
-                <button class="tab-button" data-tab="formatting">✨ テキスト整形</button>
-                <button class="tab-button" data-tab="conversion">🔤 文字列変換</button>
-                <button class="tab-button" data-tab="hash">🔐 ハッシュ</button>
-                <button class="tab-button" data-tab="diff">📝 差分比較</button>
-                <button class="tab-button" data-tab="random">🎲 ランダム生成</button>
-                <button class="tab-button" data-tab="csv">📊 CSV/TSV</button>
-                <button class="tab-button" data-tab="markdown">📄 マークダウン</button>
-                <button class="tab-button" data-tab="filter">🔎 テキストフィルター</button>
-                <button class="tab-button" data-tab="qrcode">📱 QRコード</button>
-                <button class="tab-button" data-tab="split">✂️ 分割/結合</button>
-                <button class="tab-button" data-tab="furigana">🈯 ふりがな</button>
-                <button class="tab-button" data-tab="template">📋 テンプレート</button>
-                <button class="tab-button" data-tab="frequency">📈 文字頻度</button>
+            <!-- 新しいツール切り替えナビゲーション -->
+            <nav class="tool-switcher">
+                <button class="tool-switcher-button" id="toolSwitcherBtn">
+                    <span class="current-tool-name" id="currentToolName">🔢 文字解析</span>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+
+                <!-- ドロップダウンメニュー -->
+                <div class="tool-dropdown" id="toolDropdown">
+                    <div class="dropdown-search">
+                        <input type="text" id="toolSearch" placeholder="🔍 ツールを検索..." autocomplete="off">
+                    </div>
+
+                    <div class="dropdown-content" id="dropdownContent">
+                        <!-- 📝 文字・コード -->
+                        <div class="tool-category">
+                            <div class="category-header">📝 文字・コード</div>
+                            <button class="tool-item active" data-tab="char-analysis">🔢 文字解析</button>
+                            <button class="tool-item" data-tab="encoding">🔄 エンコーディング</button>
+                            <button class="tool-item" data-tab="frequency">📈 文字頻度</button>
+                            <button class="tool-item" data-tab="furigana">🈯 ふりがな</button>
+                        </div>
+
+                        <!-- 🔍 検索・パターン -->
+                        <div class="tool-category">
+                            <div class="category-header">🔍 検索・パターン</div>
+                            <button class="tool-item" data-tab="regex">🔍 正規表現</button>
+                            <button class="tool-item" data-tab="filter">🔎 テキストフィルター</button>
+                            <button class="tool-item" data-tab="diff">📝 差分比較</button>
+                        </div>
+
+                        <!-- ✨ 変換・整形 -->
+                        <div class="tool-category">
+                            <div class="category-header">✨ 変換・整形</div>
+                            <button class="tool-item" data-tab="conversion">🔤 文字列変換</button>
+                            <button class="tool-item" data-tab="formatting">✨ テキスト整形</button>
+                            <button class="tool-item" data-tab="split">✂️ 分割/結合</button>
+                        </div>
+
+                        <!-- 📊 データ処理 -->
+                        <div class="tool-category">
+                            <div class="category-header">📊 データ処理</div>
+                            <button class="tool-item" data-tab="csv">📊 CSV/TSV</button>
+                            <button class="tool-item" data-tab="markdown">📄 マークダウン</button>
+                            <button class="tool-item" data-tab="template">📋 テンプレート</button>
+                        </div>
+
+                        <!-- 📈 分析 -->
+                        <div class="tool-category">
+                            <div class="category-header">📈 分析</div>
+                            <button class="tool-item" data-tab="statistics">📊 テキスト統計</button>
+                        </div>
+
+                        <!-- 🔐 セキュリティ -->
+                        <div class="tool-category">
+                            <div class="category-header">🔐 セキュリティ</div>
+                            <button class="tool-item" data-tab="hash">🔐 ハッシュ</button>
+                        </div>
+
+                        <!-- 🎲 生成 -->
+                        <div class="tool-category">
+                            <div class="category-header">🎲 生成</div>
+                            <button class="tool-item" data-tab="random">🎲 ランダム生成</button>
+                            <button class="tool-item" data-tab="qrcode">📱 QRコード</button>
+                        </div>
+                    </div>
+                </div>
             </nav>
 
             <!-- 文字コード表示ツール -->

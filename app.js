@@ -1343,3 +1343,126 @@ function analyzeFrequency() {
 
     frequencyOutput.innerHTML = html;
 }
+
+// ===============================================
+// ツール切り替えナビゲーション
+// ===============================================
+
+const toolSwitcherBtn = document.getElementById('toolSwitcherBtn');
+const toolDropdown = document.getElementById('toolDropdown');
+const currentToolName = document.getElementById('currentToolName');
+const toolSearch = document.getElementById('toolSearch');
+const dropdownContent = document.getElementById('dropdownContent');
+
+// ドロップダウンの開閉
+toolSwitcherBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = toolDropdown.classList.contains('show');
+
+    if (isOpen) {
+        closeDropdown();
+    } else {
+        openDropdown();
+    }
+});
+
+function openDropdown() {
+    toolDropdown.classList.add('show');
+    toolSwitcherBtn.classList.add('active');
+    toolSearch.value = '';
+    toolSearch.focus();
+    resetSearch();
+}
+
+function closeDropdown() {
+    toolDropdown.classList.remove('show');
+    toolSwitcherBtn.classList.remove('active');
+    toolSearch.value = '';
+    resetSearch();
+}
+
+// ドロップダウン外をクリックしたら閉じる
+document.addEventListener('click', (e) => {
+    if (!toolSwitcherBtn.contains(e.target) && !toolDropdown.contains(e.target)) {
+        closeDropdown();
+    }
+});
+
+// Escapeキーで閉じる
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && toolDropdown.classList.contains('show')) {
+        closeDropdown();
+    }
+});
+
+// ツールアイテムのクリック処理
+const toolItems = document.querySelectorAll('.tool-item');
+toolItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const tabId = item.getAttribute('data-tab');
+        const toolName = item.textContent.trim();
+
+        // アクティブなツールを切り替え
+        toolItems.forEach(t => t.classList.remove('active'));
+        item.classList.add('active');
+
+        // タブコンテンツを切り替え
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+
+        // 現在のツール名を更新
+        currentToolName.textContent = toolName;
+
+        // ドロップダウンを閉じる
+        closeDropdown();
+
+        // ページトップにスクロール（モバイル用）
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+});
+
+// ツール検索機能
+toolSearch.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+
+    if (!searchTerm) {
+        resetSearch();
+        return;
+    }
+
+    const categories = document.querySelectorAll('.tool-category');
+
+    categories.forEach(category => {
+        const items = category.querySelectorAll('.tool-item');
+        let hasVisibleItem = false;
+
+        items.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                item.classList.remove('hidden');
+                hasVisibleItem = true;
+            } else {
+                item.classList.add('hidden');
+            }
+        });
+
+        // カテゴリ内に表示するアイテムがない場合はカテゴリごと非表示
+        if (hasVisibleItem) {
+            category.classList.remove('hidden');
+        } else {
+            category.classList.add('hidden');
+        }
+    });
+});
+
+function resetSearch() {
+    document.querySelectorAll('.tool-category').forEach(category => {
+        category.classList.remove('hidden');
+    });
+
+    document.querySelectorAll('.tool-item').forEach(item => {
+        item.classList.remove('hidden');
+    });
+}
