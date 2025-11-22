@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="テキスト処理ツール - 文字コード表示と正規表現チェッカー">
+    <meta name="description" content="テキスト処理ツール - 文字解析、正規表現、エンコーディング変換、統計、整形、文字列変換、ハッシュ、差分比較、ランダム生成">
     <meta name="theme-color" content="#2196F3">
     <title>Text Toolbox</title>
     <link rel="stylesheet" href="styles.css">
@@ -20,8 +20,21 @@
         </header>
 
         <main>
+            <!-- タブナビゲーション -->
+            <nav class="tab-nav">
+                <button class="tab-button active" data-tab="char-analysis">🔢 文字解析</button>
+                <button class="tab-button" data-tab="regex">🔍 正規表現</button>
+                <button class="tab-button" data-tab="encoding">🔄 エンコーディング</button>
+                <button class="tab-button" data-tab="statistics">📊 テキスト統計</button>
+                <button class="tab-button" data-tab="formatting">✨ テキスト整形</button>
+                <button class="tab-button" data-tab="conversion">🔤 文字列変換</button>
+                <button class="tab-button" data-tab="hash">🔐 ハッシュ</button>
+                <button class="tab-button" data-tab="diff">📝 差分比較</button>
+                <button class="tab-button" data-tab="random">🎲 ランダム生成</button>
+            </nav>
+
             <!-- 文字コード表示ツール -->
-            <section class="tool-section">
+            <section id="char-analysis" class="tool-section tab-content active">
                 <h2>🔢 文字コード表示</h2>
                 <div class="tool-content">
                     <div class="input-group">
@@ -37,7 +50,7 @@
             </section>
 
             <!-- 正規表現チェッカー -->
-            <section class="tool-section">
+            <section id="regex" class="tool-section tab-content">
                 <h2>🔍 正規表現チェッカー</h2>
                 <div class="tool-content">
                     <div class="input-group">
@@ -68,6 +81,192 @@
                         ></textarea>
                     </div>
                     <div id="regexOutput" class="output-area"></div>
+                </div>
+            </section>
+
+            <!-- エンコーディング変換ツール -->
+            <section id="encoding" class="tool-section tab-content">
+                <h2>🔄 エンコーディング変換</h2>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label for="encodingInput">テキストを入力してください:</label>
+                        <textarea
+                            id="encodingInput"
+                            placeholder="エンコード/デコードするテキストを入力してください"
+                            rows="4"
+                        ></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button class="tool-button" onclick="encodeBase64()">Base64 エンコード</button>
+                        <button class="tool-button" onclick="decodeBase64()">Base64 デコード</button>
+                        <button class="tool-button" onclick="encodeURL()">URL エンコード</button>
+                        <button class="tool-button" onclick="decodeURL()">URL デコード</button>
+                        <button class="tool-button" onclick="encodeHTML()">HTML エンティティ</button>
+                        <button class="tool-button" onclick="encodePunycode()">Punycode エンコード</button>
+                        <button class="tool-button" onclick="decodePunycode()">Punycode デコード</button>
+                    </div>
+                    <div id="encodingOutput" class="output-area"></div>
+                </div>
+            </section>
+
+            <!-- テキスト統計ツール -->
+            <section id="statistics" class="tool-section tab-content">
+                <h2>📊 テキスト統計・解析</h2>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label for="statsInput">テキストを入力してください:</label>
+                        <textarea
+                            id="statsInput"
+                            placeholder="統計を表示するテキストを入力してください"
+                            rows="6"
+                        ></textarea>
+                    </div>
+                    <div id="statsOutput" class="output-area"></div>
+                </div>
+            </section>
+
+            <!-- テキスト整形ツール -->
+            <section id="formatting" class="tool-section tab-content">
+                <h2>✨ テキスト整形</h2>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label for="formatInput">テキストを入力してください:</label>
+                        <textarea
+                            id="formatInput"
+                            placeholder="整形するテキストを入力してください"
+                            rows="6"
+                        ></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button class="tool-button" onclick="formatJSON()">JSON 整形</button>
+                        <button class="tool-button" onclick="minifyJSON()">JSON 最小化</button>
+                        <button class="tool-button" onclick="sortLines()">行のソート (昇順)</button>
+                        <button class="tool-button" onclick="sortLinesDesc()">行のソート (降順)</button>
+                        <button class="tool-button" onclick="removeDuplicateLines()">重複行を削除</button>
+                        <button class="tool-button" onclick="removeEmptyLines()">空行を削除</button>
+                        <button class="tool-button" onclick="trimLines()">各行の空白を削除</button>
+                        <button class="tool-button" onclick="convertToSpaces()">タブ→スペース (4)</button>
+                        <button class="tool-button" onclick="convertToTabs()">スペース→タブ</button>
+                    </div>
+                    <div id="formatOutput" class="output-area"></div>
+                </div>
+            </section>
+
+            <!-- 文字列変換ツール -->
+            <section id="conversion" class="tool-section tab-content">
+                <h2>🔤 文字列変換</h2>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label for="conversionInput">テキストを入力してください:</label>
+                        <textarea
+                            id="conversionInput"
+                            placeholder="変換するテキストを入力してください"
+                            rows="4"
+                        ></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button class="tool-button" onclick="toUpperCase()">大文字に変換</button>
+                        <button class="tool-button" onclick="toLowerCase()">小文字に変換</button>
+                        <button class="tool-button" onclick="toFullWidth()">全角に変換</button>
+                        <button class="tool-button" onclick="toHalfWidth()">半角に変換</button>
+                        <button class="tool-button" onclick="toHiragana()">ひらがなに変換</button>
+                        <button class="tool-button" onclick="toKatakana()">カタカナに変換</button>
+                        <button class="tool-button" onclick="toCamelCase()">キャメルケース</button>
+                        <button class="tool-button" onclick="toSnakeCase()">スネークケース</button>
+                        <button class="tool-button" onclick="toKebabCase()">ケバブケース</button>
+                        <button class="tool-button" onclick="toPascalCase()">パスカルケース</button>
+                    </div>
+                    <div id="conversionOutput" class="output-area"></div>
+                </div>
+            </section>
+
+            <!-- ハッシュ生成ツール -->
+            <section id="hash" class="tool-section tab-content">
+                <h2>🔐 ハッシュ生成</h2>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label for="hashInput">テキストを入力してください:</label>
+                        <textarea
+                            id="hashInput"
+                            placeholder="ハッシュを生成するテキストを入力してください"
+                            rows="4"
+                        ></textarea>
+                    </div>
+                    <div id="hashOutput" class="output-area"></div>
+                </div>
+            </section>
+
+            <!-- 差分比較ツール -->
+            <section id="diff" class="tool-section tab-content">
+                <h2>📝 差分比較</h2>
+                <div class="tool-content">
+                    <div class="diff-container">
+                        <div class="input-group">
+                            <label for="diffInput1">テキスト1:</label>
+                            <textarea
+                                id="diffInput1"
+                                placeholder="比較元のテキストを入力してください"
+                                rows="6"
+                            ></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="diffInput2">テキスト2:</label>
+                            <textarea
+                                id="diffInput2"
+                                placeholder="比較先のテキストを入力してください"
+                                rows="6"
+                            ></textarea>
+                        </div>
+                    </div>
+                    <div id="diffOutput" class="output-area"></div>
+                </div>
+            </section>
+
+            <!-- ランダム生成ツール -->
+            <section id="random" class="tool-section tab-content">
+                <h2>🎲 ランダム生成</h2>
+                <div class="tool-content">
+                    <div class="random-controls">
+                        <div class="input-group">
+                            <label>パスワード生成:</label>
+                            <div class="random-password-options">
+                                <label>
+                                    <input type="number" id="passwordLength" value="16" min="4" max="128">
+                                    文字
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="includeUppercase" checked> 大文字
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="includeLowercase" checked> 小文字
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="includeNumbers" checked> 数字
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="includeSymbols"> 記号
+                                </label>
+                            </div>
+                            <button class="tool-button" onclick="generatePassword()">パスワード生成</button>
+                        </div>
+
+                        <div class="input-group">
+                            <label>UUID生成:</label>
+                            <button class="tool-button" onclick="generateUUID()">UUID (v4) 生成</button>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Lorem Ipsum生成:</label>
+                            <div class="lorem-options">
+                                <label>
+                                    <input type="number" id="loremParagraphs" value="3" min="1" max="20">
+                                    パラグラフ
+                                </label>
+                            </div>
+                            <button class="tool-button" onclick="generateLoremIpsum()">Lorem Ipsum 生成</button>
+                        </div>
+                    </div>
+                    <div id="randomOutput" class="output-area"></div>
                 </div>
             </section>
         </main>

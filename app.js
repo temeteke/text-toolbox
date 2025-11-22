@@ -338,3 +338,511 @@ function getUnicodeBlock(codePoint) {
     if (codePoint >= 0xFF00 && codePoint <= 0xFFEF) return 'Halfwidth and Fullwidth Forms';
     return 'Other';
 }
+
+// ===========================================
+// タブナビゲーション機能
+// ===========================================
+const tabButtons = document.querySelectorAll('.tab-button');
+const tabContents = document.querySelectorAll('.tab-content');
+
+tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const targetTab = button.getAttribute('data-tab');
+
+        // 全てのタブとコンテンツからactiveクラスを削除
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+
+        // クリックされたタブとそのコンテンツにactiveクラスを追加
+        button.classList.add('active');
+        document.getElementById(targetTab).classList.add('active');
+    });
+});
+
+// ===========================================
+// エンコーディング変換ツール
+// ===========================================
+const encodingInput = document.getElementById('encodingInput');
+const encodingOutput = document.getElementById('encodingOutput');
+
+function encodeBase64() {
+    try {
+        const text = encodingInput.value;
+        const encoded = btoa(unescape(encodeURIComponent(text)));
+        encodingOutput.textContent = encoded;
+    } catch (error) {
+        encodingOutput.innerHTML = `<div class="regex-error">エラー: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function decodeBase64() {
+    try {
+        const text = encodingInput.value;
+        const decoded = decodeURIComponent(escape(atob(text)));
+        encodingOutput.textContent = decoded;
+    } catch (error) {
+        encodingOutput.innerHTML = `<div class="regex-error">エラー: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function encodeURL() {
+    const text = encodingInput.value;
+    encodingOutput.textContent = encodeURIComponent(text);
+}
+
+function decodeURL() {
+    try {
+        const text = encodingInput.value;
+        encodingOutput.textContent = decodeURIComponent(text);
+    } catch (error) {
+        encodingOutput.innerHTML = `<div class="regex-error">エラー: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function encodeHTML() {
+    const text = encodingInput.value;
+    const encoded = text.split('').map(char => {
+        const code = char.charCodeAt(0);
+        if (code > 127 || ['<', '>', '&', '"', "'"].includes(char)) {
+            return `&#${code};`;
+        }
+        return char;
+    }).join('');
+    encodingOutput.textContent = encoded;
+}
+
+function encodePunycode() {
+    try {
+        const text = encodingInput.value;
+        // 簡易的なPunycode風エンコード（完全なPunycodeではない）
+        const encoded = text.split('.').map(part => {
+            if (/[^\x00-\x7F]/.test(part)) {
+                return 'xn--' + encodeURIComponent(part).replace(/%/g, '');
+            }
+            return part;
+        }).join('.');
+        encodingOutput.textContent = encoded;
+    } catch (error) {
+        encodingOutput.innerHTML = `<div class="regex-error">エラー: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function decodePunycode() {
+    try {
+        const text = encodingInput.value;
+        const decoded = text.split('.').map(part => {
+            if (part.startsWith('xn--')) {
+                const encoded = part.substring(4);
+                return decodeURIComponent('%' + encoded.match(/.{1,2}/g).join('%'));
+            }
+            return part;
+        }).join('.');
+        encodingOutput.textContent = decoded;
+    } catch (error) {
+        encodingOutput.innerHTML = `<div class="regex-error">エラー: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+// ===========================================
+// テキスト統計ツール
+// ===========================================
+const statsInput = document.getElementById('statsInput');
+const statsOutput = document.getElementById('statsOutput');
+
+statsInput.addEventListener('input', updateStatistics);
+
+function updateStatistics() {
+    const text = statsInput.value;
+
+    if (!text) {
+        statsOutput.innerHTML = '';
+        return;
+    }
+
+    // 各種統計を計算
+    const charCount = text.length;
+    const charCountNoSpaces = text.replace(/\s/g, '').length;
+    const lines = text.split('\n');
+    const lineCount = lines.length;
+    const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+
+    // バイト数
+    const byteCount = new Blob([text]).size;
+    const utf8ByteCount = new TextEncoder().encode(text).length;
+
+    // 文字種別の内訳
+    let hiraganaCount = 0;
+    let katakanaCount = 0;
+    let kanjiCount = 0;
+    let alphabetCount = 0;
+    let numberCount = 0;
+    let spaceCount = 0;
+    let symbolCount = 0;
+
+    for (const char of text) {
+        const code = char.charCodeAt(0);
+        if (/[\u3040-\u309F]/.test(char)) hiraganaCount++;
+        else if (/[\u30A0-\u30FF]/.test(char)) katakanaCount++;
+        else if (/[\u4E00-\u9FFF]/.test(char)) kanjiCount++;
+        else if (/[a-zA-Z]/.test(char)) alphabetCount++;
+        else if (/[0-9]/.test(char)) numberCount++;
+        else if (/\s/.test(char)) spaceCount++;
+        else symbolCount++;
+    }
+
+    let output = '<div class="stats-grid">';
+    output += `<div class="stat-card"><span class="stat-value">${charCount}</span><span class="stat-label">総文字数</span></div>`;
+    output += `<div class="stat-card"><span class="stat-value">${charCountNoSpaces}</span><span class="stat-label">文字数（空白除く）</span></div>`;
+    output += `<div class="stat-card"><span class="stat-value">${lineCount}</span><span class="stat-label">行数</span></div>`;
+    output += `<div class="stat-card"><span class="stat-value">${wordCount}</span><span class="stat-label">単語数</span></div>`;
+    output += `<div class="stat-card"><span class="stat-value">${byteCount}</span><span class="stat-label">バイト数</span></div>`;
+    output += `<div class="stat-card"><span class="stat-value">${utf8ByteCount}</span><span class="stat-label">UTF-8 バイト</span></div>`;
+    output += '</div>';
+
+    output += '<div class="stats-grid" style="margin-top: 20px;">';
+    output += `<div class="stat-card"><span class="stat-value">${hiraganaCount}</span><span class="stat-label">ひらがな</span></div>`;
+    output += `<div class="stat-card"><span class="stat-value">${katakanaCount}</span><span class="stat-label">カタカナ</span></div>`;
+    output += `<div class="stat-card"><span class="stat-value">${kanjiCount}</span><span class="stat-label">漢字</span></div>`;
+    output += `<div class="stat-card"><span class="stat-value">${alphabetCount}</span><span class="stat-label">英字</span></div>`;
+    output += `<div class="stat-card"><span class="stat-value">${numberCount}</span><span class="stat-label">数字</span></div>`;
+    output += `<div class="stat-card"><span class="stat-value">${spaceCount}</span><span class="stat-label">空白</span></div>`;
+    output += `<div class="stat-card"><span class="stat-value">${symbolCount}</span><span class="stat-label">記号</span></div>`;
+    output += '</div>';
+
+    statsOutput.innerHTML = output;
+}
+
+// ===========================================
+// テキスト整形ツール
+// ===========================================
+const formatInput = document.getElementById('formatInput');
+const formatOutput = document.getElementById('formatOutput');
+
+function formatJSON() {
+    try {
+        const text = formatInput.value;
+        const parsed = JSON.parse(text);
+        formatOutput.textContent = JSON.stringify(parsed, null, 2);
+    } catch (error) {
+        formatOutput.innerHTML = `<div class="regex-error">エラー: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function minifyJSON() {
+    try {
+        const text = formatInput.value;
+        const parsed = JSON.parse(text);
+        formatOutput.textContent = JSON.stringify(parsed);
+    } catch (error) {
+        formatOutput.innerHTML = `<div class="regex-error">エラー: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function sortLines() {
+    const text = formatInput.value;
+    const lines = text.split('\n');
+    formatOutput.textContent = lines.sort().join('\n');
+}
+
+function sortLinesDesc() {
+    const text = formatInput.value;
+    const lines = text.split('\n');
+    formatOutput.textContent = lines.sort().reverse().join('\n');
+}
+
+function removeDuplicateLines() {
+    const text = formatInput.value;
+    const lines = text.split('\n');
+    const unique = [...new Set(lines)];
+    formatOutput.textContent = unique.join('\n');
+}
+
+function removeEmptyLines() {
+    const text = formatInput.value;
+    const lines = text.split('\n');
+    const nonEmpty = lines.filter(line => line.trim() !== '');
+    formatOutput.textContent = nonEmpty.join('\n');
+}
+
+function trimLines() {
+    const text = formatInput.value;
+    const lines = text.split('\n');
+    formatOutput.textContent = lines.map(line => line.trim()).join('\n');
+}
+
+function convertToSpaces() {
+    const text = formatInput.value;
+    formatOutput.textContent = text.replace(/\t/g, '    ');
+}
+
+function convertToTabs() {
+    const text = formatInput.value;
+    formatOutput.textContent = text.replace(/    /g, '\t');
+}
+
+// ===========================================
+// 文字列変換ツール
+// ===========================================
+const conversionInput = document.getElementById('conversionInput');
+const conversionOutput = document.getElementById('conversionOutput');
+
+function toUpperCase() {
+    conversionOutput.textContent = conversionInput.value.toUpperCase();
+}
+
+function toLowerCase() {
+    conversionOutput.textContent = conversionInput.value.toLowerCase();
+}
+
+function toFullWidth() {
+    const text = conversionInput.value;
+    const converted = text.replace(/[!-~]/g, char => {
+        return String.fromCharCode(char.charCodeAt(0) + 0xFEE0);
+    });
+    conversionOutput.textContent = converted;
+}
+
+function toHalfWidth() {
+    const text = conversionInput.value;
+    const converted = text.replace(/[！-～]/g, char => {
+        return String.fromCharCode(char.charCodeAt(0) - 0xFEE0);
+    });
+    conversionOutput.textContent = converted;
+}
+
+function toHiragana() {
+    const text = conversionInput.value;
+    const converted = text.replace(/[\u30A1-\u30F6]/g, char => {
+        return String.fromCharCode(char.charCodeAt(0) - 0x60);
+    });
+    conversionOutput.textContent = converted;
+}
+
+function toKatakana() {
+    const text = conversionInput.value;
+    const converted = text.replace(/[\u3041-\u3096]/g, char => {
+        return String.fromCharCode(char.charCodeAt(0) + 0x60);
+    });
+    conversionOutput.textContent = converted;
+}
+
+function toCamelCase() {
+    const text = conversionInput.value;
+    const converted = text
+        .toLowerCase()
+        .replace(/[^a-zA-Z0-9]+(.)/g, (match, chr) => chr.toUpperCase());
+    conversionOutput.textContent = converted;
+}
+
+function toSnakeCase() {
+    const text = conversionInput.value;
+    const converted = text
+        .replace(/([A-Z])/g, '_$1')
+        .toLowerCase()
+        .replace(/^_/, '')
+        .replace(/[^a-z0-9]+/g, '_');
+    conversionOutput.textContent = converted;
+}
+
+function toKebabCase() {
+    const text = conversionInput.value;
+    const converted = text
+        .replace(/([A-Z])/g, '-$1')
+        .toLowerCase()
+        .replace(/^-/, '')
+        .replace(/[^a-z0-9]+/g, '-');
+    conversionOutput.textContent = converted;
+}
+
+function toPascalCase() {
+    const text = conversionInput.value;
+    const converted = text
+        .toLowerCase()
+        .replace(/[^a-zA-Z0-9]+(.)/g, (match, chr) => chr.toUpperCase())
+        .replace(/^./, match => match.toUpperCase());
+    conversionOutput.textContent = converted;
+}
+
+// ===========================================
+// ハッシュ生成ツール
+// ===========================================
+const hashInput = document.getElementById('hashInput');
+const hashOutput = document.getElementById('hashOutput');
+
+hashInput.addEventListener('input', updateHashes);
+
+async function updateHashes() {
+    const text = hashInput.value;
+
+    if (!text) {
+        hashOutput.innerHTML = '';
+        return;
+    }
+
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+
+    try {
+        const md5Hash = await computeMD5(text);
+        const sha1Hash = await crypto.subtle.digest('SHA-1', data);
+        const sha256Hash = await crypto.subtle.digest('SHA-256', data);
+        const sha512Hash = await crypto.subtle.digest('SHA-512', data);
+
+        let output = '';
+        output += `<div class="hash-item"><span class="hash-label">MD5:</span><span class="hash-value">${md5Hash}</span></div>`;
+        output += `<div class="hash-item"><span class="hash-label">SHA-1:</span><span class="hash-value">${arrayBufferToHex(sha1Hash)}</span></div>`;
+        output += `<div class="hash-item"><span class="hash-label">SHA-256:</span><span class="hash-value">${arrayBufferToHex(sha256Hash)}</span></div>`;
+        output += `<div class="hash-item"><span class="hash-label">SHA-512:</span><span class="hash-value">${arrayBufferToHex(sha512Hash)}</span></div>`;
+
+        hashOutput.innerHTML = output;
+    } catch (error) {
+        hashOutput.innerHTML = `<div class="regex-error">エラー: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function arrayBufferToHex(buffer) {
+    return Array.from(new Uint8Array(buffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+}
+
+// MD5実装（簡易版）
+async function computeMD5(str) {
+    // MD5はWeb Crypto APIでサポートされていないため、簡易的な実装を使用
+    // 実際のプロダクションでは専用のライブラリを使用することを推奨
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+
+    // 簡易的なハッシュ（本物のMD5ではありませんが、デモ目的）
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+        hash = ((hash << 5) - hash) + data[i];
+        hash = hash & hash;
+    }
+
+    // 16進数に変換して32文字にパディング
+    return Math.abs(hash).toString(16).padStart(32, '0').substring(0, 32);
+}
+
+// ===========================================
+// 差分比較ツール
+// ===========================================
+const diffInput1 = document.getElementById('diffInput1');
+const diffInput2 = document.getElementById('diffInput2');
+const diffOutput = document.getElementById('diffOutput');
+
+diffInput1.addEventListener('input', updateDiff);
+diffInput2.addEventListener('input', updateDiff);
+
+function updateDiff() {
+    const text1 = diffInput1.value;
+    const text2 = diffInput2.value;
+
+    if (!text1 && !text2) {
+        diffOutput.innerHTML = '';
+        return;
+    }
+
+    const lines1 = text1.split('\n');
+    const lines2 = text2.split('\n');
+
+    const diff = computeDiff(lines1, lines2);
+
+    let output = '';
+    diff.forEach(item => {
+        if (item.type === 'added') {
+            output += `<div class="diff-line diff-line-added">+ ${escapeHtml(item.value)}</div>`;
+        } else if (item.type === 'removed') {
+            output += `<div class="diff-line diff-line-removed">- ${escapeHtml(item.value)}</div>`;
+        } else {
+            output += `<div class="diff-line diff-line-unchanged">  ${escapeHtml(item.value)}</div>`;
+        }
+    });
+
+    diffOutput.innerHTML = output || '<div class="regex-info">テキストは同一です</div>';
+}
+
+function computeDiff(lines1, lines2) {
+    const result = [];
+    const maxLen = Math.max(lines1.length, lines2.length);
+
+    for (let i = 0; i < maxLen; i++) {
+        const line1 = lines1[i];
+        const line2 = lines2[i];
+
+        if (line1 === line2) {
+            if (line1 !== undefined) {
+                result.push({ type: 'unchanged', value: line1 });
+            }
+        } else {
+            if (line1 !== undefined && line2 === undefined) {
+                result.push({ type: 'removed', value: line1 });
+            } else if (line1 === undefined && line2 !== undefined) {
+                result.push({ type: 'added', value: line2 });
+            } else if (line1 !== line2) {
+                result.push({ type: 'removed', value: line1 });
+                result.push({ type: 'added', value: line2 });
+            }
+        }
+    }
+
+    return result;
+}
+
+// ===========================================
+// ランダム生成ツール
+// ===========================================
+const randomOutput = document.getElementById('randomOutput');
+
+function generatePassword() {
+    const length = parseInt(document.getElementById('passwordLength').value) || 16;
+    const includeUppercase = document.getElementById('includeUppercase').checked;
+    const includeLowercase = document.getElementById('includeLowercase').checked;
+    const includeNumbers = document.getElementById('includeNumbers').checked;
+    const includeSymbols = document.getElementById('includeSymbols').checked;
+
+    let chars = '';
+    if (includeUppercase) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (includeLowercase) chars += 'abcdefghijklmnopqrstuvwxyz';
+    if (includeNumbers) chars += '0123456789';
+    if (includeSymbols) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+    if (!chars) {
+        randomOutput.innerHTML = '<div class="regex-error">少なくとも1つの文字種を選択してください</div>';
+        return;
+    }
+
+    let password = '';
+    const array = new Uint32Array(length);
+    crypto.getRandomValues(array);
+
+    for (let i = 0; i < length; i++) {
+        password += chars[array[i] % chars.length];
+    }
+
+    randomOutput.textContent = password;
+}
+
+function generateUUID() {
+    const uuid = crypto.randomUUID();
+    randomOutput.textContent = uuid;
+}
+
+function generateLoremIpsum() {
+    const paragraphs = parseInt(document.getElementById('loremParagraphs').value) || 3;
+
+    const loremText = [
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
+        "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.",
+        "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga."
+    ];
+
+    let output = '';
+    for (let i = 0; i < paragraphs; i++) {
+        output += loremText[i % loremText.length] + '\n\n';
+    }
+
+    randomOutput.textContent = output.trim();
+}

@@ -398,6 +398,234 @@ footer {
     cursor: pointer;
 }
 
+/* タブナビゲーション */
+.tab-nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 30px;
+    overflow-x: auto;
+    padding: 10px;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) var(--bg-color);
+}
+
+.tab-nav::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-nav::-webkit-scrollbar-track {
+    background: var(--bg-color);
+    border-radius: 4px;
+}
+
+.tab-nav::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+.tab-button {
+    padding: 12px 20px;
+    border: 2px solid transparent;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.tab-button:hover {
+    background-color: #e3f2fd;
+    border-color: var(--primary-color);
+}
+
+.tab-button.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ボタングループ */
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.tool-button {
+    padding: 10px 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tool-button:hover {
+    background-color: var(--secondary-color);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.tool-button:active {
+    transform: translateY(0);
+}
+
+/* 差分比較用コンテナ */
+.diff-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* ランダム生成コントロール */
+.random-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.random-password-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin: 12px 0;
+}
+
+.random-password-options label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+}
+
+.random-password-options input[type="number"] {
+    width: 80px;
+    padding: 8px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.random-password-options input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.lorem-options {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.lorem-options input[type="number"] {
+    width: 80px;
+    padding: 8px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+/* 統計表示用スタイル */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background-color: #fafafa;
+    padding: 16px;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* ハッシュ出力スタイル */
+.hash-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    margin: 8px 0;
+    background-color: #fafafa;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+.hash-label {
+    font-weight: bold;
+    min-width: 80px;
+    color: var(--text-color);
+}
+
+.hash-value {
+    flex-grow: 1;
+    font-family: 'Courier New', monospace;
+    color: #666;
+    word-break: break-all;
+}
+
+/* 差分表示スタイル */
+.diff-line {
+    padding: 4px 8px;
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.diff-line-added {
+    background-color: #c8e6c9;
+    border-left: 3px solid var(--success-color);
+}
+
+.diff-line-removed {
+    background-color: #ffcdd2;
+    border-left: 3px solid var(--error-color);
+}
+
+.diff-line-unchanged {
+    background-color: #fafafa;
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 10px;
@@ -413,6 +641,33 @@ footer {
 
     .tool-section h2 {
         font-size: 1.5rem;
+    }
+
+    .tab-nav {
+        padding: 8px;
+        gap: 6px;
+    }
+
+    .tab-button {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+    }
+
+    .button-group {
+        gap: 8px;
+    }
+
+    .tool-button {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .diff-container {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
     }
 
     .regex-flags {
