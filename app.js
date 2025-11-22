@@ -1,4 +1,181 @@
+// ===========================================
+// URLパラメータ同期機能
+// ===========================================
+
+// debounce関数: 頻繁な更新を防ぐ
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// URLパラメータを更新する
+function updateURLParams() {
+    const params = new URLSearchParams();
+
+    // アクティブなタブを保存
+    const activeTab = document.querySelector('.tab-button.active');
+    if (activeTab) {
+        const tabId = activeTab.getAttribute('data-tab');
+        params.set('tab', tabId);
+    }
+
+    // 各ツールの入力値を保存
+    const inputs = {
+        charInput: charInput.value,
+        regexPattern: regexPattern.value,
+        regexInput: regexInput.value,
+        flagGlobal: flagGlobal.checked ? '1' : '0',
+        flagIgnoreCase: flagIgnoreCase.checked ? '1' : '0',
+        flagMultiline: flagMultiline.checked ? '1' : '0',
+        encodingInput: encodingInput.value,
+        statsInput: statsInput.value,
+        formatInput: formatInput.value,
+        conversionInput: conversionInput.value,
+        hashInput: hashInput.value,
+        diffInput1: diffInput1.value,
+        diffInput2: diffInput2.value,
+        passwordLength: document.getElementById('passwordLength').value,
+        includeUppercase: document.getElementById('includeUppercase').checked ? '1' : '0',
+        includeLowercase: document.getElementById('includeLowercase').checked ? '1' : '0',
+        includeNumbers: document.getElementById('includeNumbers').checked ? '1' : '0',
+        includeSymbols: document.getElementById('includeSymbols').checked ? '1' : '0',
+        loremParagraphs: document.getElementById('loremParagraphs').value
+    };
+
+    // 値が空でないものだけをパラメータに追加
+    for (const [key, value] of Object.entries(inputs)) {
+        if (value && value !== '0' && value !== '') {
+            // Base64エンコードで日本語などの文字列を安全に保存
+            if (typeof value === 'string' && !key.includes('include') && !key.includes('flag') && !key.includes('Length') && !key.includes('Paragraphs')) {
+                try {
+                    const encoded = btoa(unescape(encodeURIComponent(value)));
+                    params.set(key, encoded);
+                } catch (e) {
+                    // エンコードに失敗した場合は通常の値を使用
+                    params.set(key, value);
+                }
+            } else {
+                params.set(key, value);
+            }
+        }
+    }
+
+    // URLを更新（ページをリロードせずに）
+    const newURL = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+    window.history.replaceState({}, '', newURL);
+}
+
+// URLパラメータから値を復元する
+function restoreFromURLParams() {
+    const params = new URLSearchParams(window.location.search);
+
+    // アクティブなタブを復元
+    const tabId = params.get('tab');
+    if (tabId) {
+        const tabButton = document.querySelector(`[data-tab="${tabId}"]`);
+        if (tabButton) {
+            tabButton.click();
+        }
+    }
+
+    // 各入力値を復元
+    const decodeParam = (value) => {
+        try {
+            return decodeURIComponent(escape(atob(value)));
+        } catch (e) {
+            return value;
+        }
+    };
+
+    if (params.has('charInput')) {
+        charInput.value = decodeParam(params.get('charInput'));
+        charInput.dispatchEvent(new Event('input'));
+    }
+
+    if (params.has('regexPattern')) {
+        regexPattern.value = decodeParam(params.get('regexPattern'));
+    }
+    if (params.has('regexInput')) {
+        regexInput.value = decodeParam(params.get('regexInput'));
+    }
+    if (params.has('flagGlobal')) {
+        flagGlobal.checked = params.get('flagGlobal') === '1';
+    }
+    if (params.has('flagIgnoreCase')) {
+        flagIgnoreCase.checked = params.get('flagIgnoreCase') === '1';
+    }
+    if (params.has('flagMultiline')) {
+        flagMultiline.checked = params.get('flagMultiline') === '1';
+    }
+    if (params.has('regexPattern') || params.has('regexInput')) {
+        updateRegexChecker();
+    }
+
+    if (params.has('encodingInput')) {
+        encodingInput.value = decodeParam(params.get('encodingInput'));
+    }
+
+    if (params.has('statsInput')) {
+        statsInput.value = decodeParam(params.get('statsInput'));
+        updateStatistics();
+    }
+
+    if (params.has('formatInput')) {
+        formatInput.value = decodeParam(params.get('formatInput'));
+    }
+
+    if (params.has('conversionInput')) {
+        conversionInput.value = decodeParam(params.get('conversionInput'));
+    }
+
+    if (params.has('hashInput')) {
+        hashInput.value = decodeParam(params.get('hashInput'));
+        updateHashes();
+    }
+
+    if (params.has('diffInput1')) {
+        diffInput1.value = decodeParam(params.get('diffInput1'));
+    }
+    if (params.has('diffInput2')) {
+        diffInput2.value = decodeParam(params.get('diffInput2'));
+    }
+    if (params.has('diffInput1') || params.has('diffInput2')) {
+        updateDiff();
+    }
+
+    if (params.has('passwordLength')) {
+        document.getElementById('passwordLength').value = params.get('passwordLength');
+    }
+    if (params.has('includeUppercase')) {
+        document.getElementById('includeUppercase').checked = params.get('includeUppercase') === '1';
+    }
+    if (params.has('includeLowercase')) {
+        document.getElementById('includeLowercase').checked = params.get('includeLowercase') === '1';
+    }
+    if (params.has('includeNumbers')) {
+        document.getElementById('includeNumbers').checked = params.get('includeNumbers') === '1';
+    }
+    if (params.has('includeSymbols')) {
+        document.getElementById('includeSymbols').checked = params.get('includeSymbols') === '1';
+    }
+    if (params.has('loremParagraphs')) {
+        document.getElementById('loremParagraphs').value = params.get('loremParagraphs');
+    }
+}
+
+// debounce版のURLパラメータ更新（500ms待機）
+const debouncedUpdateURL = debounce(updateURLParams, 500);
+
+// ===========================================
 // 文字コード表示機能
+// ===========================================
 const charInput = document.getElementById('charInput');
 const charCodeOutput = document.getElementById('charCodeOutput');
 const charModal = document.getElementById('charModal');
@@ -32,6 +209,9 @@ charInput.addEventListener('input', (e) => {
             showCharModal(char);
         });
     });
+
+    // URLパラメータを更新
+    debouncedUpdateURL();
 });
 
 // 正規表現チェッカー機能
@@ -125,11 +305,26 @@ function updateRegexChecker() {
     }
 }
 
-regexPattern.addEventListener('input', updateRegexChecker);
-regexInput.addEventListener('input', updateRegexChecker);
-flagGlobal.addEventListener('change', updateRegexChecker);
-flagIgnoreCase.addEventListener('change', updateRegexChecker);
-flagMultiline.addEventListener('change', updateRegexChecker);
+regexPattern.addEventListener('input', () => {
+    updateRegexChecker();
+    debouncedUpdateURL();
+});
+regexInput.addEventListener('input', () => {
+    updateRegexChecker();
+    debouncedUpdateURL();
+});
+flagGlobal.addEventListener('change', () => {
+    updateRegexChecker();
+    debouncedUpdateURL();
+});
+flagIgnoreCase.addEventListener('change', () => {
+    updateRegexChecker();
+    debouncedUpdateURL();
+});
+flagMultiline.addEventListener('change', () => {
+    updateRegexChecker();
+    debouncedUpdateURL();
+});
 
 // ヘルパー関数
 function escapeHtml(text) {
@@ -356,6 +551,9 @@ tabButtons.forEach(button => {
         // クリックされたタブとそのコンテンツにactiveクラスを追加
         button.classList.add('active');
         document.getElementById(targetTab).classList.add('active');
+
+        // URLパラメータを更新
+        updateURLParams();
     });
 });
 
@@ -364,6 +562,9 @@ tabButtons.forEach(button => {
 // ===========================================
 const encodingInput = document.getElementById('encodingInput');
 const encodingOutput = document.getElementById('encodingOutput');
+
+// エンコーディング入力のURL同期
+encodingInput.addEventListener('input', debouncedUpdateURL);
 
 function encodeBase64() {
     try {
@@ -449,7 +650,10 @@ function decodePunycode() {
 const statsInput = document.getElementById('statsInput');
 const statsOutput = document.getElementById('statsOutput');
 
-statsInput.addEventListener('input', updateStatistics);
+statsInput.addEventListener('input', () => {
+    updateStatistics();
+    debouncedUpdateURL();
+});
 
 function updateStatistics() {
     const text = statsInput.value;
@@ -518,6 +722,9 @@ function updateStatistics() {
 const formatInput = document.getElementById('formatInput');
 const formatOutput = document.getElementById('formatOutput');
 
+// テキスト整形入力のURL同期
+formatInput.addEventListener('input', debouncedUpdateURL);
+
 function formatJSON() {
     try {
         const text = formatInput.value;
@@ -585,6 +792,9 @@ function convertToTabs() {
 // ===========================================
 const conversionInput = document.getElementById('conversionInput');
 const conversionOutput = document.getElementById('conversionOutput');
+
+// 文字列変換入力のURL同期
+conversionInput.addEventListener('input', debouncedUpdateURL);
 
 function toUpperCase() {
     conversionOutput.textContent = conversionInput.value.toUpperCase();
@@ -669,7 +879,10 @@ function toPascalCase() {
 const hashInput = document.getElementById('hashInput');
 const hashOutput = document.getElementById('hashOutput');
 
-hashInput.addEventListener('input', updateHashes);
+hashInput.addEventListener('input', () => {
+    updateHashes();
+    debouncedUpdateURL();
+});
 
 async function updateHashes() {
     const text = hashInput.value;
@@ -731,8 +944,14 @@ const diffInput1 = document.getElementById('diffInput1');
 const diffInput2 = document.getElementById('diffInput2');
 const diffOutput = document.getElementById('diffOutput');
 
-diffInput1.addEventListener('input', updateDiff);
-diffInput2.addEventListener('input', updateDiff);
+diffInput1.addEventListener('input', () => {
+    updateDiff();
+    debouncedUpdateURL();
+});
+diffInput2.addEventListener('input', () => {
+    updateDiff();
+    debouncedUpdateURL();
+});
 
 function updateDiff() {
     const text1 = diffInput1.value;
@@ -794,6 +1013,14 @@ function computeDiff(lines1, lines2) {
 // ===========================================
 const randomOutput = document.getElementById('randomOutput');
 
+// ランダム生成オプションのURL同期
+document.getElementById('passwordLength').addEventListener('input', debouncedUpdateURL);
+document.getElementById('includeUppercase').addEventListener('change', debouncedUpdateURL);
+document.getElementById('includeLowercase').addEventListener('change', debouncedUpdateURL);
+document.getElementById('includeNumbers').addEventListener('change', debouncedUpdateURL);
+document.getElementById('includeSymbols').addEventListener('change', debouncedUpdateURL);
+document.getElementById('loremParagraphs').addEventListener('input', debouncedUpdateURL);
+
 function generatePassword() {
     const length = parseInt(document.getElementById('passwordLength').value) || 16;
     const includeUppercase = document.getElementById('includeUppercase').checked;
@@ -846,3 +1073,11 @@ function generateLoremIpsum() {
 
     randomOutput.textContent = output.trim();
 }
+
+// ===========================================
+// ページロード時の初期化
+// ===========================================
+// DOMContentLoaded後にURLパラメータから状態を復元
+document.addEventListener('DOMContentLoaded', () => {
+    restoreFromURLParams();
+});
