@@ -107,7 +107,7 @@ function updateRegexChecker() {
         });
         highlightedText += escapeHtml(text.substring(lastIndex));
 
-        output += `<div style="margin-bottom: 10px; padding: 10px; background-color: white; border-radius: 6px; border: 1px solid #ddd;">${highlightedText}</div>`;
+        output += `<div style="margin-bottom: 6px; padding: 6px 8px; background-color: white; border-radius: 6px; border: 1px solid #ddd;">${highlightedText}</div>`;
 
         // マッチ詳細リスト
         output += '<div class="match-list"><strong>マッチの詳細:</strong>';
