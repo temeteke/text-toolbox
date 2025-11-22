@@ -1,7 +1,7 @@
 {
   "name": "Text Toolbox",
   "short_name": "TextToolbox",
-  "description": "テキスト関連の便利ツール - 文字コード表示と正規表現チェッカー",
+  "description": "テキスト関連の便利ツール - 文字解析、正規表現、エンコーディング、統計、整形、変換、ハッシュ、差分比較、ランダム生成",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
