@@ -1,4 +1,4 @@
-const CACHE_NAME = 'text-toolbox-v1';
+const CACHE_NAME = 'text-toolbox-v2';
 const urlsToCache = [
   '.',
   'index.html',

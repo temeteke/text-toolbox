@@ -846,3 +846,500 @@ function generateLoremIpsum() {
 
     randomOutput.textContent = output.trim();
 }
+
+// ===========================================
+// CSV/TSVフォーマッター
+// ===========================================
+const csvInput = document.getElementById('csvInput');
+const csvOutput = document.getElementById('csvOutput');
+
+function getCSVDelimiter() {
+    const selected = document.querySelector('input[name="csvDelimiter"]:checked');
+    return selected ? (selected.value === '\\t' ? '\t' : selected.value) : ',';
+}
+
+function parseCSV(text, delimiter) {
+    const lines = text.trim().split('\n');
+    return lines.map(line => {
+        const cells = [];
+        let cell = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === delimiter && !inQuotes) {
+                cells.push(cell.trim());
+                cell = '';
+            } else {
+                cell += char;
+            }
+        }
+        cells.push(cell.trim());
+        return cells;
+    });
+}
+
+function csvToTable() {
+    const text = csvInput.value;
+    if (!text) {
+        csvOutput.innerHTML = '<div class="regex-error">CSVデータを入力してください</div>';
+        return;
+    }
+
+    const delimiter = getCSVDelimiter();
+    const hasHeader = document.getElementById('csvHasHeader').checked;
+    const rows = parseCSV(text, delimiter);
+
+    let html = '<table class="csv-table">';
+
+    rows.forEach((row, index) => {
+        html += '<tr>';
+        const tag = (hasHeader && index === 0) ? 'th' : 'td';
+        row.forEach(cell => {
+            html += `<${tag}>${escapeHtml(cell)}</${tag}>`;
+        });
+        html += '</tr>';
+    });
+
+    html += '</table>';
+    csvOutput.innerHTML = html;
+}
+
+function csvToJSON() {
+    const text = csvInput.value;
+    if (!text) {
+        csvOutput.innerHTML = '<div class="regex-error">CSVデータを入力してください</div>';
+        return;
+    }
+
+    const delimiter = getCSVDelimiter();
+    const hasHeader = document.getElementById('csvHasHeader').checked;
+    const rows = parseCSV(text, delimiter);
+
+    if (hasHeader && rows.length > 0) {
+        const headers = rows[0];
+        const data = rows.slice(1).map(row => {
+            const obj = {};
+            headers.forEach((header, i) => {
+                obj[header] = row[i] || '';
+            });
+            return obj;
+        });
+        csvOutput.textContent = JSON.stringify(data, null, 2);
+    } else {
+        csvOutput.textContent = JSON.stringify(rows, null, 2);
+    }
+}
+
+function csvToMarkdown() {
+    const text = csvInput.value;
+    if (!text) {
+        csvOutput.innerHTML = '<div class="regex-error">CSVデータを入力してください</div>';
+        return;
+    }
+
+    const delimiter = getCSVDelimiter();
+    const hasHeader = document.getElementById('csvHasHeader').checked;
+    const rows = parseCSV(text, delimiter);
+
+    let markdown = '';
+    rows.forEach((row, index) => {
+        markdown += '| ' + row.join(' | ') + ' |\n';
+        if (hasHeader && index === 0) {
+            markdown += '| ' + row.map(() => '---').join(' | ') + ' |\n';
+        }
+    });
+
+    csvOutput.textContent = markdown;
+}
+
+function csvToTSV() {
+    const text = csvInput.value;
+    if (!text) {
+        csvOutput.innerHTML = '<div class="regex-error">CSVデータを入力してください</div>';
+        return;
+    }
+
+    const currentDelimiter = getCSVDelimiter();
+    const newDelimiter = currentDelimiter === '\t' ? ',' : '\t';
+    const rows = parseCSV(text, currentDelimiter);
+
+    const output = rows.map(row => row.join(newDelimiter)).join('\n');
+    csvOutput.textContent = output;
+}
+
+function csvSort() {
+    const text = csvInput.value;
+    if (!text) {
+        csvOutput.innerHTML = '<div class="regex-error">CSVデータを入力してください</div>';
+        return;
+    }
+
+    const delimiter = getCSVDelimiter();
+    const hasHeader = document.getElementById('csvHasHeader').checked;
+    const rows = parseCSV(text, delimiter);
+
+    if (hasHeader && rows.length > 1) {
+        const header = rows[0];
+        const dataRows = rows.slice(1);
+        dataRows.sort((a, b) => (a[0] || '').localeCompare(b[0] || ''));
+        const sorted = [header, ...dataRows];
+        csvOutput.textContent = sorted.map(row => row.join(delimiter)).join('\n');
+    } else {
+        rows.sort((a, b) => (a[0] || '').localeCompare(b[0] || ''));
+        csvOutput.textContent = rows.map(row => row.join(delimiter)).join('\n');
+    }
+}
+
+// ===========================================
+// マークダウンプレビュー
+// ===========================================
+const markdownInput = document.getElementById('markdownInput');
+const markdownPreview = document.getElementById('markdownPreview');
+const markdownOutput = document.getElementById('markdownOutput');
+
+markdownInput.addEventListener('input', updateMarkdownPreview);
+
+function updateMarkdownPreview() {
+    const text = markdownInput.value;
+    if (!text) {
+        markdownPreview.innerHTML = '';
+        return;
+    }
+
+    markdownPreview.innerHTML = convertMarkdownToHTML(text);
+}
+
+function markdownToHTML() {
+    const text = markdownInput.value;
+    if (!text) {
+        markdownOutput.innerHTML = '<div class="regex-error">マークダウンを入力してください</div>';
+        return;
+    }
+
+    markdownOutput.textContent = convertMarkdownToHTML(text);
+}
+
+function convertMarkdownToHTML(markdown) {
+    let html = markdown;
+
+    // コードブロック
+    html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+
+    // 見出し
+    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+    // 太字・斜体
+    html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+    // リンク
+    html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2">$1</a>');
+
+    // 画像
+    html = html.replace(/!\[([^\]]*)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1">');
+
+    // リスト
+    html = html.replace(/^\* (.+)$/gim, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+
+    // インラインコード
+    html = html.replace(/`(.+?)`/g, '<code>$1</code>');
+
+    // 改行
+    html = html.replace(/\n\n/g, '</p><p>');
+    html = '<p>' + html + '</p>';
+
+    return html;
+}
+
+// ===========================================
+// テキストフィルター
+// ===========================================
+const filterInput = document.getElementById('filterInput');
+const filterOutput = document.getElementById('filterOutput');
+const filterPattern = document.getElementById('filterPattern');
+
+function extractNumbers() {
+    const text = filterInput.value;
+    const result = text.match(/[0-9]/g);
+    filterOutput.textContent = result ? result.join('') : '';
+}
+
+function extractAlpha() {
+    const text = filterInput.value;
+    const result = text.match(/[a-zA-Z]/g);
+    filterOutput.textContent = result ? result.join('') : '';
+}
+
+function extractHiragana() {
+    const text = filterInput.value;
+    const result = text.match(/[\u3040-\u309F]/g);
+    filterOutput.textContent = result ? result.join('') : '';
+}
+
+function extractKatakana() {
+    const text = filterInput.value;
+    const result = text.match(/[\u30A0-\u30FF]/g);
+    filterOutput.textContent = result ? result.join('') : '';
+}
+
+function extractKanji() {
+    const text = filterInput.value;
+    const result = text.match(/[\u4E00-\u9FFF]/g);
+    filterOutput.textContent = result ? result.join('') : '';
+}
+
+function removeNumbers() {
+    const text = filterInput.value;
+    filterOutput.textContent = text.replace(/[0-9]/g, '');
+}
+
+function removeSymbols() {
+    const text = filterInput.value;
+    filterOutput.textContent = text.replace(/[^\w\s\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/g, '');
+}
+
+function filterLines() {
+    const text = filterInput.value;
+    const pattern = filterPattern.value;
+
+    if (!pattern) {
+        filterOutput.innerHTML = '<div class="regex-error">フィルターパターンを入力してください</div>';
+        return;
+    }
+
+    const lines = text.split('\n');
+    const filtered = lines.filter(line => line.includes(pattern));
+    filterOutput.textContent = filtered.join('\n');
+}
+
+// ===========================================
+// QRコード生成
+// ===========================================
+const qrInput = document.getElementById('qrInput');
+const qrOutput = document.getElementById('qrOutput');
+
+function generateQRCode() {
+    const text = qrInput.value;
+
+    if (!text) {
+        qrOutput.innerHTML = '<div class="regex-error">テキストを入力してください</div>';
+        return;
+    }
+
+    // QRコードAPIを使用（外部サービス）
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(text)}`;
+
+    qrOutput.innerHTML = `
+        <div class="qr-container">
+            <img src="${qrUrl}" alt="QR Code" class="qr-image">
+            <p><a href="${qrUrl}" download="qrcode.png" class="qr-download">QRコードをダウンロード</a></p>
+        </div>
+    `;
+}
+
+// ===========================================
+// テキスト分割/結合
+// ===========================================
+const splitInput = document.getElementById('splitInput');
+const splitOutput = document.getElementById('splitOutput');
+
+function splitByChars() {
+    const text = splitInput.value;
+    const chars = parseInt(document.getElementById('splitChars').value) || 100;
+
+    if (!text) {
+        splitOutput.innerHTML = '<div class="regex-error">テキストを入力してください</div>';
+        return;
+    }
+
+    const parts = [];
+    for (let i = 0; i < text.length; i += chars) {
+        parts.push(text.substring(i, i + chars));
+    }
+
+    splitOutput.textContent = parts.join('\n---\n');
+}
+
+function splitByDelimiter() {
+    const text = splitInput.value;
+    const delimiter = document.getElementById('splitDelimiter').value;
+
+    if (!text) {
+        splitOutput.innerHTML = '<div class="regex-error">テキストを入力してください</div>';
+        return;
+    }
+
+    if (!delimiter) {
+        splitOutput.innerHTML = '<div class="regex-error">区切り文字を入力してください</div>';
+        return;
+    }
+
+    const parts = text.split(delimiter);
+    splitOutput.textContent = parts.join('\n');
+}
+
+function joinLines() {
+    const text = splitInput.value;
+    const delimiter = document.getElementById('joinDelimiter').value || '';
+
+    if (!text) {
+        splitOutput.innerHTML = '<div class="regex-error">テキストを入力してください</div>';
+        return;
+    }
+
+    const lines = text.split('\n');
+    splitOutput.textContent = lines.join(delimiter);
+}
+
+// ===========================================
+// ふりがな付与
+// ===========================================
+const furiganaInput = document.getElementById('furiganaInput');
+const furiganaOutput = document.getElementById('furiganaOutput');
+
+function addFurigana() {
+    const text = furiganaInput.value;
+
+    if (!text) {
+        furiganaOutput.innerHTML = '<div class="regex-error">テキストを入力してください</div>';
+        return;
+    }
+
+    // 簡易的なふりがな付与（実際の辞書ベースではない）
+    let result = '';
+    for (const char of text) {
+        if (/[\u4E00-\u9FFF]/.test(char)) {
+            // 漢字の場合、音読み風の表示（実際には辞書が必要）
+            result += `${char}(?)`;
+        } else {
+            result += char;
+        }
+    }
+
+    furiganaOutput.innerHTML = `<div class="info-box">
+        <p>${escapeHtml(result)}</p>
+        <small>※ 正確なふりがなを生成するには外部辞書APIが必要です。このツールは漢字の位置を示すのみです。</small>
+    </div>`;
+}
+
+function generateRubyHTML() {
+    const text = furiganaInput.value;
+
+    if (!text) {
+        furiganaOutput.innerHTML = '<div class="regex-error">テキストを入力してください</div>';
+        return;
+    }
+
+    let result = '';
+    for (const char of text) {
+        if (/[\u4E00-\u9FFF]/.test(char)) {
+            result += `<ruby>${escapeHtml(char)}<rt>?</rt></ruby>`;
+        } else {
+            result += escapeHtml(char);
+        }
+    }
+
+    furiganaOutput.textContent = result;
+}
+
+// ===========================================
+// テンプレート置換
+// ===========================================
+const templateInput = document.getElementById('templateInput');
+const templateVars = document.getElementById('templateVars');
+const templateOutput = document.getElementById('templateOutput');
+
+function applyTemplate() {
+    const template = templateInput.value;
+    const varsText = templateVars.value;
+
+    if (!template) {
+        templateOutput.innerHTML = '<div class="regex-error">テンプレートを入力してください</div>';
+        return;
+    }
+
+    if (!varsText) {
+        templateOutput.innerHTML = '<div class="regex-error">変数を入力してください</div>';
+        return;
+    }
+
+    try {
+        const vars = JSON.parse(varsText);
+        let result = template;
+
+        for (const [key, value] of Object.entries(vars)) {
+            const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+            result = result.replace(regex, value);
+        }
+
+        templateOutput.textContent = result;
+    } catch (error) {
+        templateOutput.innerHTML = `<div class="regex-error">エラー: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+// ===========================================
+// 文字頻度分析
+// ===========================================
+const frequencyInput = document.getElementById('frequencyInput');
+const frequencyOutput = document.getElementById('frequencyOutput');
+
+function analyzeFrequency() {
+    const text = frequencyInput.value;
+
+    if (!text) {
+        frequencyOutput.innerHTML = '<div class="regex-error">テキストを入力してください</div>';
+        return;
+    }
+
+    const type = document.querySelector('input[name="frequencyType"]:checked').value;
+    const top = parseInt(document.getElementById('frequencyTop').value) || 20;
+
+    const frequency = new Map();
+
+    if (type === 'char') {
+        for (const char of text) {
+            if (char.trim()) {
+                frequency.set(char, (frequency.get(char) || 0) + 1);
+            }
+        }
+    } else {
+        const words = text.split(/\s+/);
+        for (const word of words) {
+            if (word.trim()) {
+                frequency.set(word, (frequency.get(word) || 0) + 1);
+            }
+        }
+    }
+
+    const sorted = Array.from(frequency.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, top);
+
+    const maxCount = sorted[0][1];
+
+    let html = '<div class="frequency-list">';
+    sorted.forEach(([item, count], index) => {
+        const percentage = (count / maxCount * 100).toFixed(1);
+        html += `
+            <div class="frequency-item">
+                <div class="frequency-rank">#${index + 1}</div>
+                <div class="frequency-char">${escapeHtml(item)}</div>
+                <div class="frequency-bar">
+                    <div class="frequency-bar-fill" style="width: ${percentage}%"></div>
+                </div>
+                <div class="frequency-count">${count}回</div>
+            </div>
+        `;
+    });
+    html += '</div>';
+
+    frequencyOutput.innerHTML = html;
+}
