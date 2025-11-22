@@ -20,7 +20,7 @@ charInput.addEventListener('input', (e) => {
         const codePoint = char.codePointAt(0);
         const charCode = char.charCodeAt(0);
 
-        output += `<div class="char-item" data-char="${escapeHtml(char)}" data-index="${i}"><div class="char-display">${escapeHtml(char)}</div><div class="char-codes"><div><strong>文字:</strong> ${getCharacterName(char)}</div><div><strong>Unicode:</strong> U+${codePoint.toString(16).toUpperCase().padStart(4, '0')}</div><div><strong>10進数:</strong> ${codePoint}</div><div><strong>16進数:</strong> 0x${codePoint.toString(16).toUpperCase()}</div><div><strong>8進数:</strong> 0o${codePoint.toString(8)}</div><div><strong>2進数:</strong> 0b${codePoint.toString(2)}</div><div><strong>UTF-16:</strong> ${getUTF16String(char)}</div></div></div>`;
+        output += `<div class="char-item" data-char="${escapeHtml(char)}" data-index="${i}"><div class="char-display">${escapeHtml(char)}</div><div class="char-codes"><div><strong>文字:</strong> ${getCharacterName(char)}</div><div><strong>Unicode:</strong> U+${codePoint.toString(16).toUpperCase().padStart(4, '0')}</div><div><strong>10進数:</strong> ${codePoint}</div><div><strong>UTF-16:</strong> ${getUTF16String(char)}</div></div></div>`;
     }
 
     charCodeOutput.innerHTML = output;
@@ -144,7 +144,7 @@ function getCharacterName(char) {
     if (char === '\t') return 'タブ';
     if (char === '\r') return 'キャリッジリターン';
     if (/\s/.test(char)) return '空白文字';
-    return `"${char}"`;
+    return char;
 }
 
 function getUTF16String(char) {
@@ -186,7 +186,9 @@ function showCharModal(char) {
         { name: 'Yu Gothic', family: '"Yu Gothic", "游ゴシック", sans-serif' },
         { name: 'Hiragino Sans', family: '"Hiragino Sans", "ヒラギノ角ゴ ProN", sans-serif' },
         { name: 'Meiryo', family: 'Meiryo, "メイリオ", sans-serif' },
-        { name: 'MS Gothic', family: '"MS Gothic", "MS ゴシック", monospace' }
+        { name: 'MS Gothic', family: '"MS Gothic", "MS ゴシック", monospace' },
+        { name: 'MS Mincho', family: '"MS Mincho", "MS 明朝", serif' },
+        { name: 'Yu Mincho', family: '"Yu Mincho", "游明朝", serif' }
     ];
 
     let modalContent = `
