@@ -17,20 +17,7 @@ charInput.addEventListener('input', (e) => {
         const codePoint = char.codePointAt(0);
         const charCode = char.charCodeAt(0);
 
-        output += `
-            <div class="char-item">
-                <div class="char-display">${escapeHtml(char)}</div>
-                <div class="char-codes">
-                    <div><strong>文字:</strong> ${getCharacterName(char)}</div>
-                    <div><strong>Unicode:</strong> U+${codePoint.toString(16).toUpperCase().padStart(4, '0')}</div>
-                    <div><strong>10進数:</strong> ${codePoint}</div>
-                    <div><strong>16進数:</strong> 0x${codePoint.toString(16).toUpperCase()}</div>
-                    <div><strong>8進数:</strong> 0o${codePoint.toString(8)}</div>
-                    <div><strong>2進数:</strong> 0b${codePoint.toString(2)}</div>
-                    <div><strong>UTF-16:</strong> ${getUTF16String(char)}</div>
-                </div>
-            </div>
-        `;
+        output += `<div class="char-item"><div class="char-display">${escapeHtml(char)}</div><div class="char-codes"><div><strong>文字:</strong> ${getCharacterName(char)}</div><div><strong>Unicode:</strong> U+${codePoint.toString(16).toUpperCase().padStart(4, '0')}</div><div><strong>10進数:</strong> ${codePoint}</div><div><strong>16進数:</strong> 0x${codePoint.toString(16).toUpperCase()}</div><div><strong>8進数:</strong> 0o${codePoint.toString(8)}</div><div><strong>2進数:</strong> 0b${codePoint.toString(2)}</div><div><strong>UTF-16:</strong> ${getUTF16String(char)}</div></div></div>`;
     }
 
     charCodeOutput.innerHTML = output;
@@ -107,7 +94,7 @@ function updateRegexChecker() {
         });
         highlightedText += escapeHtml(text.substring(lastIndex));
 
-        output += `<div style="margin-bottom: 10px; padding: 10px; background-color: white; border-radius: 6px; border: 1px solid #ddd;">${highlightedText}</div>`;
+        output += `<div style="margin-bottom: 6px; padding: 6px 8px; background-color: white; border-radius: 6px; border: 1px solid #ddd;">${highlightedText}</div>`;
 
         // マッチ詳細リスト
         output += '<div class="match-list"><strong>マッチの詳細:</strong>';
@@ -116,13 +103,7 @@ function updateRegexChecker() {
             if (m.groups.length > 0) {
                 groupsInfo = '<br><small>グループ: ' + m.groups.map((g, idx) => `$${idx + 1}="${escapeHtml(g || '')}"`).join(', ') + '</small>';
             }
-            output += `
-                <div class="match-item">
-                    <strong>#${i + 1}:</strong> "${escapeHtml(m.text)}"
-                    <small>(位置: ${m.index}〜${m.index + m.text.length - 1})</small>
-                    ${groupsInfo}
-                </div>
-            `;
+            output += `<div class="match-item"><strong>#${i + 1}:</strong> "${escapeHtml(m.text)}" <small>(位置: ${m.index}〜${m.index + m.text.length - 1})</small>${groupsInfo}</div>`;
         });
         output += '</div>';
 
